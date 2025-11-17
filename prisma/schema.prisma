@@ -1,0 +1,63 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String   @default("user") // user | mentor | admin
+  createdAt DateTime @default(now())
+
+  userSkills   UserSkill[]
+  learningPaths LearningPath[]
+}
+
+model Skill {
+  id        String      @id @default(cuid())
+  name      String
+  category  String?
+  createdAt DateTime     @default(now())
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  id        String   @id @default(cuid())
+  userId    String
+  skillId   String
+  level     String   // beginner | intermediate | advanced
+  evidence  String?  // link de curso, certificado, etc.
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+}
+
+model LearningPath {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  level       String // iniciante, intermediário, avançado
+  createdAt   DateTime @default(now())
+  userId      String?
+
+  user  User?  @relation(fields: [userId], references: [id])
+  tasks Task[]
+}
+
+model Task {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  status          String   @default("pending") // pending | done
+  dueDate         DateTime?
+  createdAt       DateTime @default(now())
+  learningPathId  String
+
+  learningPath LearningPath @relation(fields: [learningPathId], references: [id])
+}
