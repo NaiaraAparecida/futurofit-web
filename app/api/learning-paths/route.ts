@@ -8,5 +8,5 @@ export async function GET() {
         },
     });
 
-    return NextResponse.json(paths);
+    return NextResponse.json(paths, { status: 200 });
 }
