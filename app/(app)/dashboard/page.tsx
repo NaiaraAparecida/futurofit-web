@@ -4,16 +4,18 @@ import Link from "next/link";
 import type { LearningPathDTO, TaskDTO } from "@/types";
 
 export default async function DashboardPage() {
-    const paths = (await prisma.learningPath.findMany({
+    const paths: LearningPathDTO[] = await prisma.learningPath.findMany({
         include: { tasks: true },
-    })) as LearningPathDTO[];
+    }) as LearningPathDTO[];
 
-    // Tipagem corrigida
-    const allTasks: TaskDTO[] = paths.flatMap((p: LearningPathDTO) => p.tasks);
+    // Tipagem *explicitíssima* para Vercel
+    const allTasks: TaskDTO[] = paths.flatMap((p: LearningPathDTO): TaskDTO[] => {
+        return p.tasks as TaskDTO[];
+    });
 
-    const done = allTasks.filter((t: TaskDTO) => t.status === "done").length;
-    const total = allTasks.length || 1;
-    const progress = Math.round((done / total) * 100);
+    const done: number = allTasks.filter((t: TaskDTO) => t.status === "done").length;
+    const total: number = allTasks.length || 1;
+    const progress: number = Math.round((done / total) * 100);
 
     return (
         <section aria-labelledby="dashboard-title">
@@ -65,9 +67,9 @@ export default async function DashboardPage() {
             {/* Trilhas */}
             <div className="space-y-4">
                 {paths.map((path: LearningPathDTO) => {
-                    const totalTasks = path.tasks.length || 1;
-                    const doneTasks = path.tasks.filter((t) => t.status === "done").length;
-                    const localProgress = Math.round((doneTasks / totalTasks) * 100);
+                    const totalTasks: number = path.tasks.length || 1;
+                    const doneTasks: number = path.tasks.filter((t) => t.status === "done").length;
+                    const localProgress: number = Math.round((doneTasks / totalTasks) * 100);
 
                     return (
                         <article
@@ -126,5 +128,6 @@ export default async function DashboardPage() {
         </section>
     );
 }
+
 
 
