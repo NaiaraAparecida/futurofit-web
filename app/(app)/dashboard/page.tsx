@@ -1,14 +1,17 @@
 // app/(app)/dashboard/page.tsx
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import type { LearningPathDTO, TaskDTO } from "@/types";
 
 export default async function DashboardPage() {
-    const paths = await prisma.learningPath.findMany({
+    const paths = (await prisma.learningPath.findMany({
         include: { tasks: true },
-    });
+    })) as LearningPathDTO[];
 
-    const allTasks = paths.flatMap((p) => p.tasks);
-    const done = allTasks.filter((t) => t.status === "done").length;
+    // Tipagem corrigida
+    const allTasks: TaskDTO[] = paths.flatMap((p: LearningPathDTO) => p.tasks);
+
+    const done = allTasks.filter((t: TaskDTO) => t.status === "done").length;
     const total = allTasks.length || 1;
     const progress = Math.round((done / total) * 100);
 
@@ -50,9 +53,7 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300 md:col-span-2">
-                    <p className="font-medium text-slate-100">
-                        Próximos passos sugeridos
-                    </p>
+                    <p className="font-medium text-slate-100">Próximos passos sugeridos</p>
                     <ul className="mt-2 list-disc space-y-1 pl-4 text-xs">
                         <li>Reforce habilidades digitais básicas (SQL, Git, Excel).</li>
                         <li>Pratique comunicação assíncrona e colaboração remota.</li>
@@ -63,7 +64,7 @@ export default async function DashboardPage() {
 
             {/* Trilhas */}
             <div className="space-y-4">
-                {paths.map((path) => {
+                {paths.map((path: LearningPathDTO) => {
                     const totalTasks = path.tasks.length || 1;
                     const doneTasks = path.tasks.filter((t) => t.status === "done").length;
                     const localProgress = Math.round((doneTasks / totalTasks) * 100);
@@ -100,17 +101,18 @@ export default async function DashboardPage() {
                             </div>
 
                             <ul className="mt-3 space-y-1 text-sm text-slate-200">
-                                {path.tasks.map((task) => (
+                                {path.tasks.map((task: TaskDTO) => (
                                     <li
                                         key={task.id}
                                         className="flex items-center justify-between rounded-lg bg-slate-900/60 px-2 py-1"
                                     >
                                         <span>{task.title}</span>
                                         <span
-                                            className={`rounded-full px-2 py-0.5 text-xs ${task.status === "done"
+                                            className={`rounded-full px-2 py-0.5 text-xs ${
+                                                task.status === "done"
                                                     ? "bg-emerald-600/70 text-emerald-50"
                                                     : "bg-slate-800 text-slate-200"
-                                                }`}
+                                            }`}
                                         >
                                             {task.status === "done" ? "Concluída" : "Pendente"}
                                         </span>
@@ -124,3 +126,4 @@ export default async function DashboardPage() {
         </section>
     );
 }
+

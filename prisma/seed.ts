@@ -4,15 +4,18 @@ const prisma = new PrismaClient();
 
 async function main() {
     // Criar habilidades (mantive como _soft/_digital só pra não dar warning de ESLint)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _soft = await prisma.skill.create({
         data: { name: "Comunicação", category: "soft" },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _digital = await prisma.skill.create({
         data: { name: "Excel", category: "digital" },
     });
 
     // Criar trilha 1
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _lp1 = await prisma.learningPath.create({
         data: {
             title: "Transição para Dados",
@@ -36,6 +39,7 @@ async function main() {
     });
 
     // Criar trilha 2
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _lp2 = await prisma.learningPath.create({
         data: {
             title: "Habilidades Digitais",
